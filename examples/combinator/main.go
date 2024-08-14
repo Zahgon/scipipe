@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/scipipe/scipipe"
@@ -16,16 +17,22 @@ func main() {
 
 	comb := NewCombinator(wf, "combinator", func() map[string][]string {
 		out := map[string][]string{
-			"p:l": []string{},
-			"p:n": []string{},
-			"p:u": []string{},
+			"f:infile": []string{},
+			"p:l":      []string{},
+			"p:n":      []string{},
+			"p:u":      []string{},
 		}
-		for _, l := range []string{"a", "b", "c"} {
-			for _, n := range []string{"1", "2", "3"} {
-				for _, u := range []string{"A", "B", "C"} {
-					out["p:l"] = append(out["p:l"], l)
-					out["p:n"] = append(out["p:n"], n)
-					out["p:u"] = append(out["p:u"], u)
+		paths, err := filepath.Glob("infiles/*.txt")
+		scipipe.Check(err)
+		for _, f := range paths {
+			for _, l := range []string{"a", "b", "c"} {
+				for _, n := range []string{"1", "2", "3"} {
+					for _, u := range []string{"A", "B", "C"} {
+						out["f:infile"] = append(out["f:infile"], f)
+						out["p:l"] = append(out["p:l"], l)
+						out["p:n"] = append(out["p:n"], n)
+						out["p:u"] = append(out["p:u"], u)
+					}
 				}
 			}
 		}
@@ -33,12 +40,14 @@ func main() {
 	})
 
 	// Initialize processes
-	greeter := wf.NewProc("fooer", "echo {p:l}{p:n}{p:u} > {o:combinations}")
+	greeter := wf.NewProc("fooer", "echo $(cat {i:basefile}){p:l}{p:n}{p:u} > {o:combinations}")
+	greeter.In("basefile").From(comb.OutPort("infile"))
 	greeter.InParam("l").From(comb.OutParamPort("l"))
 	greeter.InParam("n").From(comb.OutParamPort("n"))
 	greeter.InParam("u").From(comb.OutParamPort("u"))
 	greeter.SetOutFunc("combinations", func(t *scipipe.Task) string {
-		return fmt.Sprintf("%s%s%s.txt", t.Param("l"), t.Param("n"), t.Param("u"))
+		basePath := strings.ReplaceAll(filepath.Base(t.InPath("basefile")), ".txt", "")
+		return fmt.Sprintf("out/%s-%s%s%s.txt", basePath, t.Param("l"), t.Param("n"), t.Param("u"))
 	})
 
 	// Run the workflow

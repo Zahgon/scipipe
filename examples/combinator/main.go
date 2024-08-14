@@ -11,17 +11,23 @@ import (
 	sp "github.com/scipipe/scipipe"
 )
 
+// ------------------------------------------------------------------------------
+// Demo workflow
+// ------------------------------------------------------------------------------
+
 func main() {
 	// Create a workflow, using 4 cpu cores
 	wf := sp.NewWorkflow("my_workflow", 1)
 
-	comb := NewCombinator(wf, "combinator", func() map[string][]string {
+	// Initialize combinator process
+	generateCombinations := func() map[string][]string {
 		out := map[string][]string{
 			"f:infile": []string{},
 			"p:l":      []string{},
 			"p:n":      []string{},
 			"p:u":      []string{},
 		}
+
 		paths, err := filepath.Glob("infiles/*.txt")
 		scipipe.Check(err)
 		for _, f := range paths {
@@ -36,15 +42,17 @@ func main() {
 				}
 			}
 		}
-		return out
-	})
 
-	// Initialize processes
+		return out
+	}
+	combinator := NewCombinator(wf, "combinator", generateCombinations)
+
+	// Initialize and Connect Greeter
 	greeter := wf.NewProc("fooer", "echo $(cat {i:basefile}){p:l}{p:n}{p:u} > {o:combinations}")
-	greeter.In("basefile").From(comb.OutPort("infile"))
-	greeter.InParam("l").From(comb.OutParamPort("l"))
-	greeter.InParam("n").From(comb.OutParamPort("n"))
-	greeter.InParam("u").From(comb.OutParamPort("u"))
+	greeter.In("basefile").From(combinator.OutPort("infile"))
+	greeter.InParam("l").From(combinator.OutParamPort("l"))
+	greeter.InParam("n").From(combinator.OutParamPort("n"))
+	greeter.InParam("u").From(combinator.OutParamPort("u"))
 	greeter.SetOutFunc("combinations", func(t *scipipe.Task) string {
 		basePath := strings.ReplaceAll(filepath.Base(t.InPath("basefile")), ".txt", "")
 		return fmt.Sprintf("out/%s-%s%s%s.txt", basePath, t.Param("l"), t.Param("n"), t.Param("u"))
@@ -53,6 +61,10 @@ func main() {
 	// Run the workflow
 	wf.Run()
 }
+
+// ------------------------------------------------------------------------------
+// Combinator component implementation
+// ------------------------------------------------------------------------------
 
 type Combinator struct {
 	scipipe.BaseProcess

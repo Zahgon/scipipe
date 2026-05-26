@@ -12,23 +12,13 @@ type ParamSource struct {
 
 // NewParamSource returns a new ParamSource
 func NewParamSource(wf *scipipe.Workflow, name string, params ...string) *ParamSource {
-	p := &ParamSource{
-		BaseProcess: scipipe.NewBaseProcess(wf, name),
-		params:      params,
-	}
-	p.InitOutParamPort(p, "out")
-	wf.AddProc(p)
-	return p
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Out returns the out-port, on which parameters the process was initialized
 // with, will be retrieved.
-func (p *ParamSource) Out() *scipipe.OutParamPort { return p.OutParamPort("out") }
+func (p *ParamSource) Out() *scipipe.OutParamPort { _ = "STUB: not implemented"; return nil }
 
 // Run runs the process
-func (p *ParamSource) Run() {
-	defer p.CloseAllOutPorts()
-	for _, param := range p.params {
-		p.Out().Send(param)
-	}
-}
+func (p *ParamSource) Run() { _ = "STUB: not implemented"; return }

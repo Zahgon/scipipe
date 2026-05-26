@@ -1,9 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"os"
-	"sort"
 	"strings"
 	"text/template"
 	"time"
@@ -42,183 +39,46 @@ var (
 )
 
 func auditInfoToHTML(inFilePath string, outFilePath string, flatten bool) error {
-	ip, err := scipipe.NewFileIP(strings.Replace(inFilePath, ".audit.json", "", 1))
-	scipipe.Check(err)
-	auditInfo := ip.AuditInfo()
-
-	outHTML := fmt.Sprintf(headHTMLPattern, ip.Path())
-	if flatten {
-		auditInfosByID := extractAuditInfosByID(auditInfo)
-		auditInfosByStartTime := sortAuditInfosByStartTime(auditInfosByID)
-		for _, ai := range auditInfosByStartTime {
-			ai.Upstream = nil
-			outHTML += formatTaskHTML(ai.ProcessName, ai)
-		}
-	} else {
-		outHTML += formatTaskHTML(ip.Path(), auditInfo)
-	}
-	outHTML += bottomHTML
-
-	if _, err := os.Stat(outFilePath); os.IsExist(err) {
-		return errWrap(err, "File already exists:"+outFilePath)
-	}
-	outFile, err := os.Create(outFilePath)
-	if err != nil {
-		return errWrap(err, "Could not create file:"+outFilePath)
-	}
-	outFile.WriteString(outHTML)
-	outFile.Close()
-	fmt.Println("Wrote audit HTML file to: " + outFilePath)
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func formatTaskHTML(fileName string, auditInfo *scipipe.AuditInfo) (outHTML string) {
-	outHTML = "<table>\n"
-	outHTML += fmt.Sprintf("	<tr><td colspan=\"2\" class=\"task-title\"><strong>%s</strong> / <a name=\"%s\" href=\"#%s\"><code>%s</code></a></td></tr>\n", auditInfo.ProcessName, auditInfo.ID, auditInfo.ID, auditInfo.ID)
-	outHTML += fmt.Sprintf("	<tr><td colspan=\"2\"><div class=\"cmdbox\">%s</div></td></tr>\n", auditInfo.Command)
-
-	params := []string{}
-	for pname, p := range auditInfo.Params {
-		params = append(params, fmt.Sprintf("%s: %s", pname, p))
-	}
-	outHTML += fmt.Sprintf("	<tr><th>Parameters:</th><td>%s</td></tr>\n", strings.Join(params, ", "))
-	tags := []string{}
-	for pname, p := range auditInfo.Tags {
-		tags = append(tags, fmt.Sprintf("%s: %s", pname, p))
-	}
-	outHTML += fmt.Sprintf("	<tr><th>Tags:</th><td><pre>%v</pre></td></tr>\n", strings.Join(tags, ", "))
-
-	outHTML += fmt.Sprintf("	<tr><th>Start time:</th><td>%s<span class=\"greyout\">%s</span></td></tr>\n", auditInfo.StartTime.Format(`2006-01-02 15:04:05`), auditInfo.StartTime.Format(`.000 -0700 MST`))
-	outHTML += fmt.Sprintf("	<tr><th>Finish time:</th><td>%s<span class=\"greyout\">%s</span></td></tr>\n", auditInfo.FinishTime.Format(`2006-01-02 15:04:05`), auditInfo.FinishTime.Format(`.000 -0700 MST`))
-	et := auditInfo.ExecTimeNS
-	outHTML += fmt.Sprintf("	<tr><th>Execution time:</th><td>%s</td></tr>\n", et.Truncate(time.Millisecond).String())
-	//upStreamHTML := ""
-	//for filePath, uai := range auditInfo.Upstream {
-	//	upStreamHTML += formatTaskHTML(filePath, uai)
-	//}
-	//if outHTML != "" {
-	//	outHTML += "<tr><th>Upstreams:</th><td>" + upStreamHTML + "</td></tr>\n"
-	//}
-	outHTML += "</table>\n"
-	return
+	_ = "STUB: not implemented"
+	return ""
 }
 
+//upStreamHTML := ""
+//for filePath, uai := range auditInfo.Upstream {
+//	upStreamHTML += formatTaskHTML(filePath, uai)
+//}
+//if outHTML != "" {
+//	outHTML += "<tr><th>Upstreams:</th><td>" + upStreamHTML + "</td></tr>\n"
+//}
+
 func auditInfoToBash(inFilePath string, outFilePath string, flatten bool) error {
-	outFile, err := os.Create(outFilePath)
-	if err != nil {
-		return err
-	}
-
-	auditInfo := scipipe.UnmarshalAuditInfoJSONFile(inFilePath)
-	auditInfosByID := extractAuditInfosByID(auditInfo)
-	auditInfosByStartTime := sortAuditInfosByStartTime(auditInfosByID)
-
-	bashTpl := template.New("Bash").Funcs(tplFuncs)
-	bashTpl, err = bashTpl.Parse(bashTemplate)
-	if err != nil {
-		return err
-	}
-
-	runTime := time.Duration(0)
-	for _, auInfo := range auditInfosByStartTime {
-		runTime += auInfo.ExecTimeNS
-	}
-
-	report := auditReport{
-		FileName:   inFilePath,
-		SciPipeVer: scipipe.Version,
-		RunTime:    runTime,
-		AuditInfos: auditInfosByStartTime,
-	}
-
-	err = bashTpl.Execute(outFile, report)
-	if err != nil {
-		return err
-	}
-	fmt.Println("Wrote audit Bash file to: " + outFilePath)
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func auditInfoToTeX(inFilePath string, outFilePath string, flatten bool) error {
-	outFile, err := os.Create(outFilePath)
-	if err != nil {
-		return err
-	}
-
-	auditInfo := scipipe.UnmarshalAuditInfoJSONFile(inFilePath)
-	auditInfosByID := extractAuditInfosByID(auditInfo)
-	auditInfosByStartTime := sortAuditInfosByStartTime(auditInfosByID)
-
-	texTpl := template.New("TeX").Funcs(tplFuncs)
-	texTpl, err = texTpl.Parse(texTemplate)
-	if err != nil {
-		return err
-	}
-
-	runTime := time.Duration(0)
-	for _, auInfo := range auditInfosByStartTime {
-		runTime += auInfo.ExecTimeNS
-	}
-
-	report := auditReport{
-		FileName:    inFilePath,
-		SciPipeVer:  scipipe.Version,
-		RunTime:     runTime,
-		AuditInfos:  auditInfosByStartTime,
-		ChartHeight: fmt.Sprintf("%.03f", 1.2+float64(len(auditInfosByStartTime))*0.6),
-	}
-
-	palette := palettes[1]
-	if len(report.AuditInfos) <= 50 {
-		palette = palettes[len(report.AuditInfos)]
-	} else {
-		palette = palettes[len(report.AuditInfos)%50]
-	}
-	for i, p := range palette {
-		report.ColorDef += fmt.Sprintf("\\definecolor{color%d}{RGB}{%d,%d,%d}\n", i, p.r, p.g, p.b)
-	}
-
-	err = texTpl.Execute(outFile, report)
-	if err != nil {
-		return err
-	}
-	fmt.Println("Wrote audit TeX file to: " + outFilePath)
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func extractAuditInfosByID(auditInfo *scipipe.AuditInfo) (auditInfosByID map[string]*scipipe.AuditInfo) {
-	auditInfosByID = make(map[string]*scipipe.AuditInfo)
-	auditInfosByID[auditInfo.ID] = auditInfo
-	for _, ai := range auditInfo.Upstream {
-		auditInfosByID = mergeStringAuditInfoMaps(auditInfosByID, extractAuditInfosByID(ai))
-	}
-	return auditInfosByID
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func mergeStringAuditInfoMaps(ms ...map[string]*scipipe.AuditInfo) (merged map[string]*scipipe.AuditInfo) {
-	merged = make(map[string]*scipipe.AuditInfo)
-	for _, m := range ms {
-		for k, v := range m {
-			merged[k] = v
-		}
-	}
-	return merged
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func sortAuditInfosByStartTime(auditInfosByID map[string]*scipipe.AuditInfo) []*scipipe.AuditInfo {
-	sorted := []*scipipe.AuditInfo{}
-
-	auditInfosByStartTime := map[time.Time]*scipipe.AuditInfo{}
-	startTimes := []time.Time{}
-	for _, ai := range auditInfosByID {
-		auditInfosByStartTime[ai.StartTime] = ai
-		startTimes = append(startTimes, ai.StartTime)
-	}
-	sort.Slice(startTimes, func(i, j int) bool { return startTimes[i].Before(startTimes[j]) })
-	for _, t := range startTimes {
-		sorted = append(sorted, auditInfosByStartTime[t])
-	}
-	return sorted
+	_ = "STUB: not implemented"
+	return nil
 }
 
 const headHTMLPattern = `<html>

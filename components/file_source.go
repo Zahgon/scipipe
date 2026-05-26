@@ -13,27 +13,13 @@ type FileSource struct {
 
 // NewFileSource returns a new initialized FileSource process
 func NewFileSource(wf *scipipe.Workflow, name string, filePaths ...string) *FileSource {
-	p := &FileSource{
-		BaseProcess: scipipe.NewBaseProcess(wf, name),
-		filePaths:   filePaths,
-	}
-	p.InitOutPort(p, "out")
-	wf.AddProc(p)
-	return p
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Out returns the out-port, on which file IPs based on the file paths the
 // process was initialized with, will be retrieved.
-func (p *FileSource) Out() *scipipe.OutPort { return p.OutPort("out") }
+func (p *FileSource) Out() *scipipe.OutPort { _ = "STUB: not implemented"; return nil }
 
 // Run runs the FileSource process
-func (p *FileSource) Run() {
-	defer p.CloseAllOutPorts()
-	for _, filePath := range p.filePaths {
-		ip, err := scipipe.NewFileIP(filePath)
-		if err != nil {
-			p.Fail(err)
-		}
-		p.Out().Send(ip)
-	}
-}
+func (p *FileSource) Run() { _ = "STUB: not implemented"; return }

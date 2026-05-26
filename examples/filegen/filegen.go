@@ -30,28 +30,12 @@ type FileIPGenerator struct {
 
 // NewFileIPGenerator initializes a new FileIPGenerator component from a list of file paths
 func NewFileIPGenerator(wf *sp.Workflow, name string, filePaths ...string) (p *FileIPGenerator) {
-	p = &FileIPGenerator{
-		BaseProcess: sp.NewBaseProcess(wf, name),
-		FilePaths:   filePaths,
-	}
-	p.InitOutPort(p, "out")
-	wf.AddProc(p)
-	return p
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Out returns the out-port of the FileIPGenerator
-func (p *FileIPGenerator) Out() *sp.OutPort {
-	return p.OutPort("out")
-}
+func (p *FileIPGenerator) Out() *sp.OutPort { _ = "STUB: not implemented"; return nil }
 
 // Run runs the FileIPGenerator process, returning instantiated FileIP
-func (p *FileIPGenerator) Run() {
-	defer p.Out().Close()
-	for _, fp := range p.FilePaths {
-		ip, err := sp.NewFileIP(fp)
-		if err != nil {
-			p.Fail(err)
-		}
-		p.Out().Send(ip)
-	}
-}
+func (p *FileIPGenerator) Run() { _ = "STUB: not implemented"; return }

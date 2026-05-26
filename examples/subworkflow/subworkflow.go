@@ -26,35 +26,16 @@ type FooBarSubWorkflow struct {
 }
 
 func NewFooBarSubWorkflow(wf *sp.Workflow, name string) *FooBarSubWorkflow {
-	fbn := &FooBarSubWorkflow{
-		name:  name,
-		Procs: make(map[string]*sp.Process),
-	}
-
-	fbn.Procs["foo"] = sp.NewProc(wf, "foo", "echo foo > {o:foo}")
-	fbn.Procs["foo"].SetOut("foo", "foo.txt")
-
-	fbn.Procs["f2b"] = sp.NewProc(wf, "f2b", "sed 's/foo/bar/g' {i:foo} > {o:bar}")
-	fbn.Procs["f2b"].SetOut("bar", "{i:foo|%.txt}.bar.txt")
-
-	// Connect together inner processes
-	fbn.Procs["foo"].Out("foo").To(fbn.Procs["f2b"].In("foo"))
-
-	// Connect last port of inner process to subnetwork out-port
-	fbn.Out = fbn.Procs["f2b"].Out("bar")
-	return fbn
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (wf *FooBarSubWorkflow) Name() string {
-	return wf.name
-}
+// Connect together inner processes
 
-func (wf *FooBarSubWorkflow) Run() {
-	for _, proc := range wf.Procs {
-		go proc.Run()
-	}
-}
+// Connect last port of inner process to subnetwork out-port
 
-func (wf *FooBarSubWorkflow) Ready() bool {
-	return wf.Out.Ready()
-}
+func (wf *FooBarSubWorkflow) Name() string { _ = "STUB: not implemented"; return "" }
+
+func (wf *FooBarSubWorkflow) Run() { _ = "STUB: not implemented"; return }
+
+func (wf *FooBarSubWorkflow) Ready() bool { _ = "STUB: not implemented"; return false }

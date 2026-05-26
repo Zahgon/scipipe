@@ -6,7 +6,7 @@
 // Prerequisites: Samtools, BWA, Picard, GATK.  You can install all tools
 // except GATK on X/L/K/Ubuntu, with this command:
 //
-//   sudo apt-get install samtools bwa picard-tools
+//	sudo apt-get install samtools bwa picard-tools
 //
 // GATK needs to be downloaded and installed manually from:
 // http://www.broadinstitute.org/gatk

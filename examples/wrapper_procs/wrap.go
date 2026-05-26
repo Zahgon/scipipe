@@ -29,17 +29,11 @@ type Fooer struct {
 	name string
 }
 
-func NewFooer(wf *sci.Workflow, name string) *Fooer {
-	innerFoo := sci.NewProc(wf, "fooer", "echo foo > {o:foo}")
-	innerFoo.SetOut("foo", "foo.txt")
-	return &Fooer{innerFoo, name}
-}
+func NewFooer(wf *sci.Workflow, name string) *Fooer { _ = "STUB: not implemented"; return nil }
 
 // Define static ports
 
-func (p *Fooer) OutFoo() *sci.OutPort {
-	return p.Out("foo")
-}
+func (p *Fooer) OutFoo() *sci.OutPort { _ = "STUB: not implemented"; return nil }
 
 // Foo2Barer
 // ---------
@@ -49,18 +43,10 @@ type Foo2Barer struct {
 	name string
 }
 
-func NewFoo2Barer(wf *sci.Workflow, name string) *Foo2Barer {
-	innerFoo2Bar := sci.NewProc(wf, "foo2bar", "sed 's/foo/bar/g' {i:foo} > {o:bar}")
-	innerFoo2Bar.SetOut("bar", "{i:foo}.bar.txt")
-	return &Foo2Barer{innerFoo2Bar, name}
-}
+func NewFoo2Barer(wf *sci.Workflow, name string) *Foo2Barer { _ = "STUB: not implemented"; return nil }
 
 // Define static ports
 
-func (p *Foo2Barer) InFoo() *sci.InPort {
-	return p.In("foo")
-}
+func (p *Foo2Barer) InFoo() *sci.InPort { _ = "STUB: not implemented"; return nil }
 
-func (p *Foo2Barer) OutBar() *sci.OutPort {
-	return p.Out("bar")
-}
+func (p *Foo2Barer) OutBar() *sci.OutPort { _ = "STUB: not implemented"; return nil }

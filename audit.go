@@ -20,15 +20,4 @@ type AuditInfo struct {
 }
 
 // NewAuditInfo returns a new AuditInfo struct
-func NewAuditInfo() *AuditInfo {
-	return &AuditInfo{
-		ID:          randSeqLC(20),
-		ProcessName: "",
-		Command:     "",
-		Params:      make(map[string]string),
-		Tags:        make(map[string]string),
-		ExecTimeNS:  -1,
-		OutFiles:    make(map[string]string),
-		Upstream:    make(map[string]*AuditInfo),
-	}
-}
+func NewAuditInfo() *AuditInfo { _ = "STUB: not implemented"; return nil }

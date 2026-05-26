@@ -35,30 +35,12 @@ type CombinatoricsGen struct {
 }
 
 func NewCombinatoricsGen(wf *sci.Workflow, name string) *CombinatoricsGen {
-	p := &CombinatoricsGen{
-		BaseProcess: sci.NewBaseProcess(wf, name),
-	}
-	p.InitOutParamPort(p, "a")
-	p.InitOutParamPort(p, "b")
-	p.InitOutParamPort(p, "c")
-	wf.AddProc(p)
-	return p
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (p *CombinatoricsGen) A() *sci.OutParamPort { return p.OutParamPort("a") }
-func (p *CombinatoricsGen) B() *sci.OutParamPort { return p.OutParamPort("b") }
-func (p *CombinatoricsGen) C() *sci.OutParamPort { return p.OutParamPort("c") }
+func (p *CombinatoricsGen) A() *sci.OutParamPort { _ = "STUB: not implemented"; return nil }
+func (p *CombinatoricsGen) B() *sci.OutParamPort { _ = "STUB: not implemented"; return nil }
+func (p *CombinatoricsGen) C() *sci.OutParamPort { _ = "STUB: not implemented"; return nil }
 
-func (p *CombinatoricsGen) Run() {
-	defer p.CloseAllOutPorts()
-
-	for _, a := range []string{"a1", "a2", "a3"} {
-		for _, b := range []string{"b1", "b2", "b3"} {
-			for _, c := range []string{"c1", "c2", "c3"} {
-				p.A().Send(a)
-				p.B().Send(b)
-				p.C().Send(c)
-			}
-		}
-	}
-}
+func (p *CombinatoricsGen) Run() { _ = "STUB: not implemented"; return }

@@ -1,11 +1,6 @@
 package components
 
 import (
-	"fmt"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-
 	"github.com/scipipe/scipipe"
 )
 
@@ -22,103 +17,19 @@ type Concatenator struct {
 
 // NewConcatenator returns a new, initialized Concatenator process
 func NewConcatenator(wf *scipipe.Workflow, name string, outPath string) *Concatenator {
-	p := &Concatenator{
-		BaseProcess: scipipe.NewBaseProcess(wf, name),
-		OutPath:     outPath,
-	}
-	p.InitInPort(p, "in")
-	p.InitOutPort(p, "out")
-
-	wf.AddProc(p)
-	return p
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // In returns the (only) in-port for this process
-func (p *Concatenator) In() *scipipe.InPort { return p.InPort("in") }
+func (p *Concatenator) In() *scipipe.InPort { _ = "STUB: not implemented"; return nil }
 
 // Out returns the (only) out-port for this process
-func (p *Concatenator) Out() *scipipe.OutPort { return p.OutPort("out") }
+func (p *Concatenator) Out() *scipipe.OutPort { _ = "STUB: not implemented"; return nil }
 
 // Run runs the Concatenator process
-func (p *Concatenator) Run() {
-	defer p.CloseAllOutPorts()
+func (p *Concatenator) Run() { _ = "STUB: not implemented"; return }
 
-	outIP, err := scipipe.NewFileIP(p.OutPath)
-	if err != nil {
-		p.Fail(err)
-	}
+// Close file handles
 
-	oipDir := filepath.Dir(outIP.Path())
-	err = os.MkdirAll(oipDir, 0777)
-	if err != nil {
-		p.Failf("Could not create directory: (%s) for out-IP (%s):\n%s", oipDir, outIP.Path(), err)
-	}
-
-	outFh, err := os.Create(outIP.Path())
-	if err != nil {
-		p.Failf("Could not open path for writing: %s\n", outIP.Path())
-	}
-
-	outIPsByTag := make(map[string]*scipipe.FileIP)
-	outFhsByTag := make(map[string]*os.File)
-
-	for inIP := range p.In().Chan {
-		tagVal := inIP.Tag(p.GroupByTag)
-		if tagVal != "" {
-			if _, ok := outIPsByTag[tagVal]; !ok {
-				outIPForTagPath := fmt.Sprintf("%s.%s_%s", p.OutPath, p.GroupByTag, tagVal)
-				outIPForTag, err := scipipe.NewFileIP(outIPForTagPath)
-				if err != nil {
-					p.Failf("Could not create FileIP with path: %s\nOriginal error: %v", outIPForTagPath, err)
-				}
-				outIPForTag.AddTag(p.GroupByTag, tagVal)
-				outIPsByTag[tagVal] = outIPForTag
-				outFh, err := os.Create(outIPForTag.Path())
-				if err != nil {
-					p.Failf("Could not create path: %s\nOriginal error: %v", outIPForTag.Path(), err)
-				}
-				outFhsByTag[tagVal] = outFh
-			}
-			dat, err := ioutil.ReadFile(inIP.Path())
-			if err != nil {
-				p.Failf("Could not read file: %s\n", inIP.Path())
-			}
-			outFhsByTag[tagVal].Write(append(dat))
-			if err != nil {
-				p.Failf("Could not write to file: %s\n", outIPsByTag[tagVal].Path())
-			}
-			outFhsByTag[tagVal].Write(append([]byte("\n")))
-			if err != nil {
-				p.Failf("Could not write to file: %s\n", outIPsByTag[tagVal].Path())
-			}
-		} else {
-			dat, err := ioutil.ReadFile(inIP.Path())
-			if err != nil {
-				p.Failf("Could not read file: %s\n", inIP.Path())
-			}
-			_, err = outFh.Write(append(dat))
-			if err != nil {
-				p.Failf("Could not write to file: %s\n", outIP.Path())
-			}
-			_, err = outFh.Write(append([]byte("\n")))
-			if err != nil {
-				p.Failf("Could not write to file: %s\n", outIP.Path())
-			}
-		}
-	}
-
-	// Close file handles
-	err = outFh.Close()
-	if err != nil {
-		p.Failf("Could not close file handle: %s\n", outIP.Path())
-	}
-	for _, taggedFh := range outFhsByTag {
-		taggedFh.Close()
-	}
-
-	// Send IPs
-	p.Out().Send(outIP)
-	for _, taggedIP := range outIPsByTag {
-		p.Out().Send(taggedIP)
-	}
-}
+// Send IPs

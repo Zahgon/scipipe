@@ -16,30 +16,16 @@ type MapToTags struct {
 
 // NewMapToTags returns an initialized MapToTags process
 func NewMapToTags(wf *scipipe.Workflow, name string, mapFunc func(ip *scipipe.FileIP) map[string]string) *MapToTags {
-	p := &MapToTags{
-		BaseProcess: scipipe.NewBaseProcess(wf, name),
-		mapFunc:     mapFunc,
-	}
-	p.InitInPort(p, "in")
-	p.InitOutPort(p, "out")
-	wf.AddProc(p)
-	return p
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // In takes input files the content of which the map function will be run,
 // to generate tags
-func (p *MapToTags) In() *scipipe.InPort { return p.InPort("in") }
+func (p *MapToTags) In() *scipipe.InPort { _ = "STUB: not implemented"; return nil }
 
 // Out outputs files that are supplemented with tags by the map function.
-func (p *MapToTags) Out() *scipipe.OutPort { return p.OutPort("out") }
+func (p *MapToTags) Out() *scipipe.OutPort { _ = "STUB: not implemented"; return nil }
 
 // Run runs the MapToTags process
-func (p *MapToTags) Run() {
-	defer p.CloseAllOutPorts()
-	for ip := range p.In().Chan {
-		newTags := p.mapFunc(ip)
-		ip.AddTags(newTags)
-		ip.WriteAuditLogToFile()
-		p.Out().Send(ip)
-	}
-}
+func (p *MapToTags) Run() { _ = "STUB: not implemented"; return }
